@@ -2,6 +2,11 @@
 import User from "../model/User.js"
 import bcrypt from 'bcrypt';
 import asyncHandler from 'express-async-handler'
+import generateToken from "../utils/generateToken.js";
+import { getTokenFromHeader } from "../utils/getTokenFromHeader.js";
+import { verifyToken } from "../utils/verifyToken.js";
+
+
 
 //@desc USER REGISTRATION
 //@route POST /api/v1/users/register
@@ -54,7 +59,10 @@ export const loginUserCtrl = asyncHandler(async(req,res) => {
         res.json({
             status: "Success",
             message: "User logged in successfully",
-            userFound
+            userFound,
+            //as soon as the user is logged in then generate the token with JWT using the id
+            token: generateToken(userFound?._id)
+            
         })
 
     }else{
@@ -64,4 +72,29 @@ export const loginUserCtrl = asyncHandler(async(req,res) => {
     //use express async handler package to handle errors. Create a middleware to catch errors that might happen
     
 })
+
+
+//@desc Get user profile
+//@route GET /api/v1/users/profile
+//@access Private
+
+export const getUserProfileCtrl = asyncHandler(async(req, res) => {
+    console.log(req.headers)
+    //get token from header
+    // const token =  req?.headers?.authorization?.split(" ")[1];
+
+    //verify token
+    
+    const token = getTokenFromHeader(req);
+    const verifiedToken = verifyToken(token);
+
+    // console.log(token);
+    // console.log(verifiedToken)
+    console.log(req)
+
+    res.json({
+        msg: "Welcome to profile page"
+    })
+})
+
 
